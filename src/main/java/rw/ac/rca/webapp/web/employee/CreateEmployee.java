@@ -1,39 +1,30 @@
-package rw.ac.rca.webapp.web;
-
-import rw.ac.rca.webapp.dao.CourseDAO;
-import rw.ac.rca.webapp.dao.StudentDAO;
-import rw.ac.rca.webapp.dao.UserDAO;
-import rw.ac.rca.webapp.dao.impl.CourseDAOImpl;
-import rw.ac.rca.webapp.dao.impl.StudentDAOImpl;
-import rw.ac.rca.webapp.orm.Course;
-import rw.ac.rca.webapp.orm.Student;
-import rw.ac.rca.webapp.orm.User;
-
+package rw.ac.rca.webapp.web.employee;
+import rw.ac.rca.webapp.dao.EmployeeDAO;
+import rw.ac.rca.webapp.dao.impl.EmployeeDAOImpl;
+import rw.ac.rca.webapp.orm.Employee;
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+
 /**
  * Servlet implementation class CreateCourse
  */
-public class CreateStudent extends HttpServlet {
+public class CreateEmployee extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private  StudentDAO studentDAO = StudentDAOImpl.getInstance();
-
+    private EmployeeDAO employeeDAO = EmployeeDAOImpl.getInstance();
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public CreateStudent() {
+    public CreateEmployee() {
         super();
         // TODO Auto-generated constructor stub
     }
-
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
@@ -46,18 +37,17 @@ public class CreateStudent extends HttpServlet {
 
         if (pageRedirect != null) {
             System.out.println("The print statement is and the only is: " + pageRedirect);
-            if (pageRedirect.equals("createStudent")) {
-                request.getRequestDispatcher("WEB-INF/pages/createStudent.jsp").forward(request, response);
+            if (pageRedirect.equals("createEmployee")) {
+                request.getRequestDispatcher("WEB-INF/employee/createEmployee.jsp").forward(request, response);
             } else {
                 request.setAttribute("error ", "No user found");
-                request.getRequestDispatcher("WEB-INF/pages/login.jsp").forward(request, response);
+                request.getRequestDispatcher("WEB-INF/login.jsp").forward(request, response);
             }
         } else {
             request.setAttribute("error ", "No user found");
-            request.getRequestDispatcher("WEB-INF/pages/login.jsp").forward(request, response);
+            request.getRequestDispatcher("WEB-INF/login.jsp").forward(request, response);
         }
     }
-
     /**
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
      */
@@ -68,38 +58,34 @@ public class CreateStudent extends HttpServlet {
 
         if(pageRedirect != null){
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            if(pageRedirect.equals("createStudent")){
-                Student student = null;
+            if(pageRedirect.equals("createEmployee")){
+                Employee employee = null;
                 try {
-                    student = new Student(
+                    employee = new Employee(
                             request.getParameter("firstName"),
                             request.getParameter("lastName"),
                             request.getParameter("phoneNumber"),
-                            simpleDateFormat.parse(request.getParameter("dob")),
-                            false,
-                            true,
-                            false
+                            simpleDateFormat.parse(request.getParameter("dateOfBirth"))
                     );
-                } catch (ParseException e) {
+                } catch ( Exception e) {
                     throw new RuntimeException(e);
                 }
-                // Saving the course;
+                // Saving the parent;
                 try {
-                    studentDAO.saveStudent(student);
-                    request.setAttribute("students", studentDAO.getAllStudents());
-                    request.setAttribute("success" , "Successfully created the Course" );
-                    request.getRequestDispatcher("WEB-INF/pages/students.jsp").forward(request , response);
-                    Thread.sleep(2000);
-                    request.removeAttribute("success");
+                    employeeDAO.saveOrUpdateEmployee(employee);
+                    List<Employee> employees = employeeDAO.getAllEmployees();
+                    request.setAttribute("success" , "Successfully created the employee" );
+                    request.setAttribute("employees", employees);
+                    request.getRequestDispatcher("WEB-INF/employee/employees.jsp").forward(request , response);
                 }catch (Exception e){
                     request.setAttribute("error" , "Failed to create the Course" );
-                    request.getRequestDispatcher("WEB-INF/pages/createStudent.jsp").forward(request , response);
+                    request.getRequestDispatcher("WEB-INF/employee/createEmployee.jsp").forward(request , response);
                 }
             }else{
-                request.getRequestDispatcher("WEB-INF/pages/login.jsp").forward(request , response);
+                request.getRequestDispatcher("WEB-INF/login.jsp").forward(request , response);
             }
         }else{
-            request.getRequestDispatcher("WEB-INF/pages/login.jsp").forward(request , response);
+            request.getRequestDispatcher("WEB-INF/login.jsp").forward(request , response);
         }
     }
 }

@@ -33,8 +33,24 @@ public class Instructor extends Person {
 	@ManyToOne
 	@JoinColumn(name = "address_id")
 	private Address address;
-	
-	public Date getRemunerationDate() {
+
+	public Instructor(String firstName, String lastName, String phoneNumber, Date teacherDOB) {
+		this.setFirstName(firstName);
+		this.setLastName(lastName);
+		this.setPhoneNumber(phoneNumber);
+		this.setDateOfBirth(teacherDOB);
+	}
+
+    public Instructor(String firstName, String lastName, String phoneNumber, Date renumerationTime, Date dob) {
+		this.setFirstName(firstName);
+		this.setLastName(lastName);
+		this.setPhoneNumber(phoneNumber);
+		this.setDateOfBirth(dob);
+		this.setRemunerationDate(renumerationTime);
+
+    }
+
+    public Date getRemunerationDate() {
 		return remunerationDate;
 	}
 	public Set<Course> getCourses() {

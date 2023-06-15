@@ -1,126 +1,60 @@
 package rw.ac.rca.webapp.dao.impl;
 
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
 import rw.ac.rca.webapp.dao.StudentDAO;
+import rw.ac.rca.webapp.orm.Student;
 import rw.ac.rca.webapp.orm.Student;
 
 import java.util.List;
 
+
 public class StudentDAOImpl extends DAO implements StudentDAO {
-    private static StudentDAOImpl instance;
+    public static final Logger LOG = Logger.getLogger(UserDAOImpl.class);
+    public static StudentDAOImpl instance;
 
-    private StudentDAOImpl() {
-
-    }
-
+    /**
+     * @return user instance
+     */
     public static StudentDAOImpl getInstance() {
         if (instance == null) {
             return new StudentDAOImpl();
+
         } else {
             return instance;
         }
     }
 
+    private StudentDAOImpl() {
+
+    }
+    @Override
+    public List<Student> getAllStudents() {
+        try{
+            begin();
+            Query query = getSession().createQuery("from Student");
+            List<Student> students = query.list();
+            commit();
+            return  students;
+        }catch (Exception e){
+            System.out.println("Error : " + e.getMessage());
+            rollback();
+            return  null;
+        }
+    }
+
     @Override
     public Student saveStudent(Student student) {
-        try {
-            begin();
-            getSession().save(student);
-            commit();
-            return student;
-        } catch (Exception e) {
-            rollback();
-            return null;
-        }
-    }
-
-    @Override
-    public Student updateStudent(Student student) {
-        try {
-            begin();
-            getSession().update(student);
-            commit();
-            return student;
-        } catch (Exception e) {
-            rollback();
-            return null;
-        }
-    }
-
-    @Override
-    public Student saveOrUpdateStudent(Student student) {
-        try {
+        try{
             begin();
             getSession().saveOrUpdate(student);
             commit();
-            return student;
-        } catch (Exception e) {
-            rollback();
-            return null;
-        }
-    }
-
-    @Override
-    public boolean deleteStudent(Student student) {
-        try {
-            begin();
-            getSession().delete(student);
-            commit();
-            return true;
-        } catch (Exception e) {
-            rollback();
-            return false;
-        }
-    }
-
-    @Override
-    public Student getStudentById(int studentId) {
-        try {
-            begin();
-            Student student = (Student) getSession().get(Student.class, studentId);
-            commit();
-            return student;
-        } catch (Exception e) {
-            rollback();
-            return null;
-        }
-    }
-
-    @Override
-    public Student getStudentByUsername(String username) {
-        try {
-            begin();
-            Student student = (Student) getSession().get(Student.class, username);
-            commit();
-            return student;
-        } catch (Exception e) {
-            rollback();
-            return null;
-        }
-    }
-
-    @Override
-    public Student getStudentByEmail(String email) {
-        try {
-            begin();
-            Student student = (Student) getSession().get(Student.class, email);
-            commit();
-            return student;
-        } catch (Exception e) {
-            rollback();
-            return null;
-        }
-    }
-
-    @Override
-    public List<Student> getAllStudents() {
-        try {
-            begin();
-            List<Student> students = getSession().createQuery("from Student").list();
-            commit();
-            return students;
-        } catch (Exception e) {
+            return  student;
+        }catch (Exception exception){
+            System.out.println("Error  failed to save student :" + exception.getMessage());
             rollback();
             return null;
         }
     }
 }
+

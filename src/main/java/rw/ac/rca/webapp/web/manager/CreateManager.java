@@ -1,18 +1,13 @@
-package rw.ac.rca.webapp.web;
+package rw.ac.rca.webapp.web.manager;
 
-import rw.ac.rca.webapp.dao.CourseDAO;
-import rw.ac.rca.webapp.dao.StudentDAO;
-import rw.ac.rca.webapp.dao.UserDAO;
-import rw.ac.rca.webapp.dao.impl.CourseDAOImpl;
-import rw.ac.rca.webapp.dao.impl.StudentDAOImpl;
-import rw.ac.rca.webapp.orm.Course;
-import rw.ac.rca.webapp.orm.Student;
-import rw.ac.rca.webapp.orm.User;
+import rw.ac.rca.webapp.dao.ManagerDAO;
+import rw.ac.rca.webapp.dao.impl.ManagerDAOImpl;
+import rw.ac.rca.webapp.orm.Manager;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,18 +17,16 @@ import javax.servlet.http.HttpSession;
 /**
  * Servlet implementation class CreateCourse
  */
-public class CreateStudent extends HttpServlet {
+public class CreateManager extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private  StudentDAO studentDAO = StudentDAOImpl.getInstance();
-
+    private ManagerDAO managerDAO = ManagerDAOImpl.getInstance();
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public CreateStudent() {
+    public CreateManager() {
         super();
         // TODO Auto-generated constructor stub
     }
-
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
@@ -46,15 +39,15 @@ public class CreateStudent extends HttpServlet {
 
         if (pageRedirect != null) {
             System.out.println("The print statement is and the only is: " + pageRedirect);
-            if (pageRedirect.equals("createStudent")) {
-                request.getRequestDispatcher("WEB-INF/pages/createStudent.jsp").forward(request, response);
+            if (pageRedirect.equals("createManager")) {
+                request.getRequestDispatcher("WEB-INF/pages/createManager.jsp").forward(request, response);
             } else {
                 request.setAttribute("error ", "No user found");
                 request.getRequestDispatcher("WEB-INF/pages/login.jsp").forward(request, response);
             }
         } else {
             request.setAttribute("error ", "No user found");
-            request.getRequestDispatcher("WEB-INF/pages/login.jsp").forward(request, response);
+            request.getRequestDispatcher("WEB-INF/login.jsp").forward(request, response);
         }
     }
 
@@ -68,32 +61,28 @@ public class CreateStudent extends HttpServlet {
 
         if(pageRedirect != null){
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            if(pageRedirect.equals("createStudent")){
-                Student student = null;
+            if(pageRedirect.equals("createManager")){
+                Manager manager = null;
                 try {
-                    student = new Student(
+                    manager = new Manager(
                             request.getParameter("firstName"),
                             request.getParameter("lastName"),
                             request.getParameter("phoneNumber"),
-                            simpleDateFormat.parse(request.getParameter("dob")),
-                            false,
-                            true,
-                            false
+                            simpleDateFormat.parse(request.getParameter("dob"))
                     );
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
                 // Saving the course;
                 try {
-                    studentDAO.saveStudent(student);
-                    request.setAttribute("students", studentDAO.getAllStudents());
-                    request.setAttribute("success" , "Successfully created the Course" );
-                    request.getRequestDispatcher("WEB-INF/pages/students.jsp").forward(request , response);
-                    Thread.sleep(2000);
-                    request.removeAttribute("success");
+                    managerDAO.saveOrUpdateManager(manager);
+                    List<Manager> managers = managerDAO.getAllManagers();
+                    request.setAttribute("success" , "Successfully created the manager" );
+                    request.setAttribute("managers", managers);
+                    request.getRequestDispatcher("WEB-INF/pages/managers.jsp").forward(request , response);
                 }catch (Exception e){
                     request.setAttribute("error" , "Failed to create the Course" );
-                    request.getRequestDispatcher("WEB-INF/pages/createStudent.jsp").forward(request , response);
+                    request.getRequestDispatcher("WEB-INF/pages/createManager.jsp").forward(request , response);
                 }
             }else{
                 request.getRequestDispatcher("WEB-INF/pages/login.jsp").forward(request , response);
